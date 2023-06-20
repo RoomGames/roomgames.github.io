@@ -12,10 +12,20 @@ body
     justify-content: center;
 }
 
+.center_text
+{
+    display: flex;
+    justify-content: center;
+    color: rgb(222, 222, 222);
+    font-family: 'Roboto Mono', monospace;
+    font-weight: 400;
+    font-size: 1.5vw;
+}
+
 #title
 {
     color: rgb(222, 222, 222);
     font-family: 'Roboto Mono', monospace;
-    font-weight: 400;
+    font-weight: 1000;
     font-size: 4vw;
 }
