@@ -12,6 +12,14 @@ body
     justify-content: center;
 }
 
+.text
+{
+    color: rgb(222, 222, 222);
+    font-family: 'Roboto Mono', monospace;
+    font-weight: 400;
+    font-size: 1.5vw;
+}
+
 .center_text
 {
     display: flex;
