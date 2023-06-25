@@ -30,6 +30,16 @@ body
     font-size: 1.5vw;
 }
 
+.center_title
+{
+    display: flex;
+    justify-content: center;
+    color: rgb(211, 211, 31);
+    font-family: 'Roboto Mono', monospace;
+    font-weight: 600;
+    font-size: 2.5vw;
+}
+
 #title
 {
     color: rgb(222, 222, 222);
