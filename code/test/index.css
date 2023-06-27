@@ -1,0 +1,7 @@
+@import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap');
+
+pre code
+{
+    font-family: 'Source Code Pro', monospace;
+    font-size: 22px;
+}

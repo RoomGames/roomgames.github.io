@@ -3,20 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="index.css">
+    <!--import highlight.js start-->
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/tokyo-night-dark.min.css">
     <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
     <script>hljs.highlightAll();</script>
+    <!--import highlight.js end-->
     <title>Code Test</title>
 </head>
 <body>
-    <pre>
-        <code class="language-c">
-#include "minos.h"
-int main()
-{
-    return 0;
-}
-        </code>
-    </pre>
+    <pre><code class="language-cpp">
+        #include &quot;minos.h&quot;
+        #include &quot;begos.h&quot;
+        #include &quot;roomgames.h&quot;
+        
+        int main()
+        {
+            RoomGames roomgames = ROOMGAMES_Start(&quot;2023.6.15&quot;);
+            roomgames.AddMember(minos);
+            roomgames.AddMember(begos);
+            while (forever)
+            {
+                roomgames.Print(&quot;Hi! We create good games in our room!&quot;);
+        
+                Idea m_idea = MINOS_GET_RANDOM_IDEA();
+                Idea b_idea = BEGOS_GET_RANDOM_IDEA();
+                Idea good_idea = Idea::Mix(m_idea, b_idea);
+        
+                Cafe cafe = KAFE_21GRAMS_MAKE_RANDOM_COFFEE();
+                Kebab kebab = KEBABCI_MAKE_KUZU_ET();
+                Pilav pilav = PILAVCI_MAKE_TAVUK_PILAV();
+        
+                Program nice_program = MINOS_DO_CODING(cafe, kebab);
+                Sketch nice_sketch = BEGOS_DO_DRAWING(cafe, pilav);
+        
+                Game game = ROOMGAMES_MakeGame(good_idea, nice_program, nice_sketch);
+        
+                Feedback feedback = ROOMGAMES_PublishGame(&quot;web&quot;, &quot;itch.io&quot;);
+        
+                Money money = ITCHIO_Pay(feedback);
+                roomgames.AddMoney(money);
+                roomgames.ShareMoney(minos, begos);
+            }
+            return 0;
+        }
+    </code></pre>
 </body>
 </html>
