@@ -1,5 +1,15 @@
 @import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap');
 
+body
+{
+    margin: 0;
+}
+
+pre
+{
+    margin: 0;
+}
+
 pre code
 {
     font-family: 'Source Code Pro', monospace;
