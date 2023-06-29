@@ -2,6 +2,7 @@ console.log("Hello, Village and Kingdom!");
 
 let canvas = document.querySelector("canvas");
 let context = canvas.getContext("2d");
+let keyState = {};
 
 canvas.width = 1024;
 canvas.height = 576;
@@ -32,31 +33,20 @@ let backgroundImagePosY = -400;
 
 class Sprite
 {
-    constructor(position)
+    constructor(image, x, y)
     {
-        this.position = position;
+        this.image = image;
+        this.x = x;
+        this.y = y;
+    }
+
+    draw()
+    {
+        context.drawImage(this.image, this.x, this.y);
     }
 }
 
-function animate()
-{
-    window.requestAnimationFrame(animate);
-    context.drawImage(mapImage, backgroundImagePosX, backgroundImagePosY);
-    context.drawImage(playerImage1, 
-        0,
-        0,
-        playerImage1.width / 4,
-        playerImage1.height,
-        canvas.width / 2 - playerImage1.width / 8, 
-        canvas.height / 2 - playerImage1.height / 2,
-        playerImage1.width / 4,
-        playerImage1.height
-    );
-}
-
-animate();
-
-let keyState = {};
+let map = new Sprite(mapImage, backgroundImagePosX, backgroundImagePosY);
 
 document.addEventListener('keydown', function(event)
 {
@@ -74,3 +64,37 @@ function checkKeyState(key)
 {
     return keyState[key] === true;
 }
+
+function animate()
+{
+    if (checkKeyState("w") || checkKeyState("ArrowUp"))
+    {
+        map.y += 5;
+    }
+    else if (checkKeyState("s") || checkKeyState("ArrowDown"))
+    {
+        map.y -= 5;
+    }
+    else if (checkKeyState("a") || checkKeyState("ArrowLeft"))
+    {
+        map.x += 5;
+    }
+    else if (checkKeyState("d") || checkKeyState("ArrowRight"))
+    {
+        map.x -= 5;
+    }
+    map.draw();
+    context.drawImage(playerImage1, 
+        0,
+        0,
+        playerImage1.width / 4,
+        playerImage1.height,
+        canvas.width / 2 - playerImage1.width / 8, 
+        canvas.height / 2 - playerImage1.height / 2,
+        playerImage1.width / 4,
+        playerImage1.height
+    );
+    window.requestAnimationFrame(animate);
+}
+
+animate();
