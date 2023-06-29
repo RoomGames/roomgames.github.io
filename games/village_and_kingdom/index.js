@@ -4,10 +4,24 @@ let canvas = document.querySelector("canvas");
 let context = canvas.getContext("2d");
 let keyState = {};
 
+//test map.js
+console.log(map_collision);
+
+class Boundary
+{
+    constructor(x, y, w, h)
+    {
+        this.x = x;
+        this.y = y;
+        this.w = w;
+        this.h = h;
+    }
+}
+
 canvas.width = 1024;
 canvas.height = 576;
 
-context.fillStyle = "white"
+context.fillStyle = "white";
 context.fillRect(0, 0, canvas.width, canvas.height);
 
 console.log(canvas);
@@ -30,6 +44,7 @@ playerImage4.src = "./resources/playerUp.png";
 
 let backgroundImagePosX = -800;
 let backgroundImagePosY = -400;
+let playerMoveSpeed = 3;
 
 class Sprite
 {
@@ -69,19 +84,19 @@ function animate()
 {
     if (checkKeyState("w") || checkKeyState("ArrowUp"))
     {
-        map.y += 5;
+        map.y += playerMoveSpeed;
     }
     else if (checkKeyState("s") || checkKeyState("ArrowDown"))
     {
-        map.y -= 5;
+        map.y -= playerMoveSpeed;
     }
     else if (checkKeyState("a") || checkKeyState("ArrowLeft"))
     {
-        map.x += 5;
+        map.x += playerMoveSpeed;
     }
     else if (checkKeyState("d") || checkKeyState("ArrowRight"))
     {
-        map.x -= 5;
+        map.x -= playerMoveSpeed;
     }
     map.draw();
     context.drawImage(playerImage1, 
