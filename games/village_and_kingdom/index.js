@@ -58,7 +58,7 @@ class Boundary
 
     draw()
     {
-        context.fillStyle = "red";
+        context.fillStyle = "rgba(255, 0, 0, 0.5)";
         context.fillRect(this.x, this.y, Boundary.width, Boundary.height);
     }
 }
@@ -147,9 +147,7 @@ let player = new Sprite(playerImage1,
     canvas.height / 2 - playerImage1.height / 2,
     4);
 
-let testBoundary = new Boundary(400, 300);
-
-let movables = [map, testBoundary];
+let movables = [map, ...boundaries];
 
 //from: https://developer.mozilla.org/en-US/docs/Games/Techniques/2D_collision_detection
 function AABB_Collision(rect1_x, rect1_y, rect1_w, rect1_h, 
@@ -174,54 +172,98 @@ function AABB_Collision(rect1_x, rect1_y, rect1_w, rect1_h,
 
 function animate()
 {
-    if (AABB_Collision(player.x, player.y, player.width, player.height,
-        testBoundary.x, testBoundary.y, Boundary.width, Boundary.height))
-    {
-        // Collision detected!
-        console.log("collision!");
-    }
+    let move = true;
     if (checkKeyState("w") || checkKeyState("ArrowUp"))
     {
-        movables.forEach(movable => {
-            movable.y += playerMoveSpeed;
-        });
+        for (let i = 0; i < boundaries.length; i++)
+        {
+            let boundary = boundaries[i];
+            if (AABB_Collision(player.x, player.y, player.width, player.height,
+                boundary.x, boundary.y + playerMoveSpeed, Boundary.width, Boundary.height))
+            {
+                // Collision detected!
+                console.log("collision!");
+                move = false;
+                break;
+            }
+        }
+        if (move)
+        {
+            movables.forEach(movable => {
+                movable.y += playerMoveSpeed;
+            });
+        }
     }
     else if (checkKeyState("s") || checkKeyState("ArrowDown"))
     {
-        movables.forEach(movable => {
-            movable.y -= playerMoveSpeed;
-        });
+        for (let i = 0; i < boundaries.length; i++)
+        {
+            let boundary = boundaries[i];
+            if (AABB_Collision(player.x, player.y, player.width, player.height,
+                boundary.x, boundary.y - playerMoveSpeed, Boundary.width, Boundary.height))
+            {
+                // Collision detected!
+                console.log("collision!");
+                move = false;
+                break;
+            }
+        }
+        if (move)
+        {
+            movables.forEach(movable => {
+                movable.y -= playerMoveSpeed;
+            });
+        }
     }
     else if (checkKeyState("a") || checkKeyState("ArrowLeft"))
     {
-        movables.forEach(movable => {
-            movable.x += playerMoveSpeed;
-        });
+        for (let i = 0; i < boundaries.length; i++)
+        {
+            let boundary = boundaries[i];
+            if (AABB_Collision(player.x, player.y, player.width, player.height,
+                boundary.x + playerMoveSpeed, boundary.y, Boundary.width, Boundary.height))
+            {
+                // Collision detected!
+                console.log("collision!");
+                move = false;
+                break;
+            }
+        }
+        if (move)
+        {
+            movables.forEach(movable => {
+                movable.x += playerMoveSpeed;
+            });
+        }
     }
     else if (checkKeyState("d") || checkKeyState("ArrowRight"))
     {
-        movables.forEach(movable => {
-            movable.x -= playerMoveSpeed;
-        });
+        for (let i = 0; i < boundaries.length; i++)
+        {
+            let boundary = boundaries[i];
+            if (AABB_Collision(player.x, player.y, player.width, player.height,
+                boundary.x - playerMoveSpeed, boundary.y, Boundary.width, Boundary.height))
+            {
+                // Collision detected!
+                console.log("collision!");
+                move = false;
+                break;
+            }
+        }
+        if (move)
+        {
+            movables.forEach(movable => {
+                movable.x -= playerMoveSpeed;
+            });
+        }
     }
     map.draw();
-    testBoundary.draw();
-    // boundaries.forEach(
-    //     boundary => {
-    //         boundary.draw();
-    //     }
-    // );
+    boundaries.forEach(
+        boundary => {
+            boundary.draw();
+        }
+    );
     player.draw();
-    // context.drawImage(playerImage1, 
-    //     0,
-    //     0,
-    //     playerImage1.width / 4,
-    //     playerImage1.height,
-    //     canvas.width / 2 - playerImage1.width / 8, 
-    //     canvas.height / 2 - playerImage1.height / 2,
-    //     playerImage1.width / 4,
-    //     playerImage1.height
-    // );
     window.requestAnimationFrame(animate);
 }
 
