@@ -32,7 +32,7 @@ function display_current_time()
     {
         timezoneString = "-" + timezoneOffsetHours;
     }
-    let format = formatString("当前时间: {0}.{1}.{2} GMT/UTC {3}", currentYear, currentMonth, currentDay, timezoneString);
+    let format = formatString("当前时间: {0}.{1}.{2} (GMT/UTC {3}:00)", currentYear, currentMonth, currentDay, timezoneString);
     current_time.innerHTML = format;
 }
 

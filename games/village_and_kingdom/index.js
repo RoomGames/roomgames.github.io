@@ -9,14 +9,25 @@ console.log(map_collision);
 
 class Boundary
 {
-    constructor(x, y, w, h)
+    static width = 48;  //12 * 4(zoom)
+    static height = 48; //12 * 4(zoom)
+
+    constructor(x, y)
     {
         this.x = x;
         this.y = y;
-        this.w = w;
-        this.h = h;
+    }
+
+    draw()
+    {
+        context.fillStyle = "red";
+        context.fillRect(this.x, this.y, Boundary.width, Boundary.height);
     }
 }
+
+let boundaries = [];
+
+
 
 canvas.width = 1024;
 canvas.height = 576;
