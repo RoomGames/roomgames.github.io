@@ -5,7 +5,18 @@ let context = canvas.getContext("2d");
 let keyState = {};
 
 //test map.js
-console.log(map_collision);
+//console.log(map_collision);
+
+let mapWidth = 70;
+let mapHeight = 40;
+const collisionSymbol = 1025;
+
+// 1D array => 2D array
+let collisionMap = [];
+for (let i = 0; i < map_collision.length; i+= mapWidth)
+{
+    collisionMap.push(map_collision.slice(i, i + mapWidth));
+}
 
 class Boundary
 {
@@ -26,8 +37,20 @@ class Boundary
 }
 
 let boundaries = [];
+collisionMap.forEach(
+    (row, i) => 
+    {
+        row.forEach(
+            (item, j) => 
+            {
+                if (item === collisionSymbol)
+                    boundaries.push(new Boundary(j * Boundary.width, i * Boundary.height));
+            }
+        );
+    }
+);
 
-
+//console.log(boundaries);
 
 canvas.width = 1024;
 canvas.height = 576;
@@ -35,8 +58,8 @@ canvas.height = 576;
 context.fillStyle = "white";
 context.fillRect(0, 0, canvas.width, canvas.height);
 
-console.log(canvas);
-console.log(context);
+//console.log(canvas);
+//console.log(context);
 
 let mapImage = new Image();
 mapImage.src = "./resources/map.png";
