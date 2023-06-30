@@ -58,7 +58,7 @@ class Boundary
 
     draw()
     {
-        context.fillStyle = "rgba(255, 0, 0, 0.5)";
+        context.fillStyle = "rgba(255, 0, 0, 0.0)";
         context.fillRect(this.x, this.y, Boundary.width, Boundary.height);
     }
 }
@@ -94,6 +94,9 @@ context.fillRect(0, 0, canvas.width, canvas.height);
 
 let mapImage = new Image();
 mapImage.src = "./resources/map.png";
+
+let foregroundImage = new Image();
+foregroundImage.src = "./resources/foreground.png";
 
 let playerImage1 = new Image();
 playerImage1.src = "./resources/playerDown.png";
@@ -142,12 +145,14 @@ class Sprite
 
 let map = new Sprite(mapImage, backgroundImagePosX, backgroundImagePosY);
 
+let foreground = new Sprite(foregroundImage, backgroundImagePosX, backgroundImagePosY);
+
 let player = new Sprite(playerImage1, 
     canvas.width / 2 - playerImage1.width / 8,
     canvas.height / 2 - playerImage1.height / 2,
     4);
 
-let movables = [map, ...boundaries];
+let movables = [map, foreground, ...boundaries];
 
 //from: https://developer.mozilla.org/en-US/docs/Games/Techniques/2D_collision_detection
 function AABB_Collision(rect1_x, rect1_y, rect1_w, rect1_h, 
@@ -264,6 +269,8 @@ function animate()
         }
     );
     player.draw();
+    foreground.draw();
+
     window.requestAnimationFrame(animate);
 }
 
