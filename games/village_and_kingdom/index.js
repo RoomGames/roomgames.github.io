@@ -1,8 +1,28 @@
 console.log("Hello, Village and Kingdom!");
 
+// canvas & context:
 let canvas = document.querySelector("canvas");
 let context = canvas.getContext("2d");
+
+// keyState:
 let keyState = {};
+
+document.addEventListener('keydown', function(event)
+{
+    keyState[event.key] = true;
+    console.log('按下键码：' + event.key);
+});
+
+document.addEventListener('keyup', function(event)
+{
+    keyState[event.key] = false;
+    console.log('释放键码：' + event.key);
+});
+
+function checkKeyState(key)
+{
+    return keyState[key] === true;
+}
 
 //test map.js
 //console.log(map_collision);
@@ -10,6 +30,13 @@ let keyState = {};
 let mapWidth = 70;
 let mapHeight = 40;
 const collisionSymbol = 1025;
+
+const offsetX = -800;
+const offsetY = -400;
+
+let backgroundImagePosX = offsetX;
+let backgroundImagePosY = offsetY;
+let playerMoveSpeed = 3;
 
 // 1D array => 2D array
 let collisionMap = [];
@@ -44,7 +71,11 @@ collisionMap.forEach(
             (item, j) => 
             {
                 if (item === collisionSymbol)
-                    boundaries.push(new Boundary(j * Boundary.width, i * Boundary.height));
+                    boundaries.push(
+                        new Boundary(
+                            j * Boundary.width + offsetX, 
+                            i * Boundary.height + offsetY)
+                    );
             }
         );
     }
@@ -76,73 +107,121 @@ playerImage3.src = "./resources/playerRight.png";
 let playerImage4 = new Image();
 playerImage4.src = "./resources/playerUp.png";
 
-let backgroundImagePosX = -800;
-let backgroundImagePosY = -400;
-let playerMoveSpeed = 3;
-
 class Sprite
 {
-    constructor(image, x, y)
+    constructor(image, x, y, frames_max = 1)
     {
         this.image = image;
         this.x = x;
         this.y = y;
+        this.frames_max = frames_max;
+        this.image.onload = ()=>
+        {
+            this.width = this.image.width / this.frames_max;
+            this.height = this.image.height;
+            console.log(this.width);
+            console.log(this.height);
+        };
     }
 
     draw()
     {
-        context.drawImage(this.image, this.x, this.y);
+        //context.drawImage(this.image, this.x, this.y);
+        context.drawImage(this.image,
+            0,
+            0,
+            this.image.width / this.frames_max,
+            this.image.height,
+            this.x,
+            this.y,
+            this.image.width / this.frames_max,
+            this.image.height
+        );
     }
 }
 
 let map = new Sprite(mapImage, backgroundImagePosX, backgroundImagePosY);
 
-document.addEventListener('keydown', function(event)
-{
-    keyState[event.key] = true;
-    console.log('按下键码：' + event.key);
-});
+let player = new Sprite(playerImage1, 
+    canvas.width / 2 - playerImage1.width / 8,
+    canvas.height / 2 - playerImage1.height / 2,
+    4);
 
-document.addEventListener('keyup', function(event)
-{
-    keyState[event.key] = false;
-    console.log('释放键码：' + event.key);
-});
+let testBoundary = new Boundary(400, 300);
 
-function checkKeyState(key)
+let movables = [map, testBoundary];
+
+//from: https://developer.mozilla.org/en-US/docs/Games/Techniques/2D_collision_detection
+function AABB_Collision(rect1_x, rect1_y, rect1_w, rect1_h, 
+    rect2_x, rect2_y, rect2_w, rect2_h)
 {
-    return keyState[key] === true;
+    if (
+        rect1_x < rect2_x + rect2_w &&
+        rect1_y < rect2_y + rect2_h &&
+        rect1_x + rect1_w > rect2_x &&
+        rect1_y + rect1_h > rect2_y
+    )
+    {
+        // Collision detected!
+        return true;
+    }
+    else
+    {
+        // No collision
+        return false;
+    }
 }
 
 function animate()
 {
+    if (AABB_Collision(player.x, player.y, player.width, player.height,
+        testBoundary.x, testBoundary.y, Boundary.width, Boundary.height))
+    {
+        // Collision detected!
+        console.log("collision!");
+    }
     if (checkKeyState("w") || checkKeyState("ArrowUp"))
     {
-        map.y += playerMoveSpeed;
+        movables.forEach(movable => {
+            movable.y += playerMoveSpeed;
+        });
     }
     else if (checkKeyState("s") || checkKeyState("ArrowDown"))
     {
-        map.y -= playerMoveSpeed;
+        movables.forEach(movable => {
+            movable.y -= playerMoveSpeed;
+        });
     }
     else if (checkKeyState("a") || checkKeyState("ArrowLeft"))
     {
-        map.x += playerMoveSpeed;
+        movables.forEach(movable => {
+            movable.x += playerMoveSpeed;
+        });
     }
     else if (checkKeyState("d") || checkKeyState("ArrowRight"))
     {
-        map.x -= playerMoveSpeed;
+        movables.forEach(movable => {
+            movable.x -= playerMoveSpeed;
+        });
     }
     map.draw();
-    context.drawImage(playerImage1, 
-        0,
-        0,
-        playerImage1.width / 4,
-        playerImage1.height,
-        canvas.width / 2 - playerImage1.width / 8, 
-        canvas.height / 2 - playerImage1.height / 2,
-        playerImage1.width / 4,
-        playerImage1.height
-    );
+    testBoundary.draw();
+    // boundaries.forEach(
+    //     boundary => {
+    //         boundary.draw();
+    //     }
+    // );
+    player.draw();
+    // context.drawImage(playerImage1, 
+    //     0,
+    //     0,
+    //     playerImage1.width / 4,
+    //     playerImage1.height,
+    //     canvas.width / 2 - playerImage1.width / 8, 
+    //     canvas.height / 2 - playerImage1.height / 2,
+    //     playerImage1.width / 4,
+    //     playerImage1.height
+    // );
     window.requestAnimationFrame(animate);
 }
 
