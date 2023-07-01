@@ -223,12 +223,10 @@ function AABB_Collision(rect1_x, rect1_y, rect1_w, rect1_h,
     }
 }
 
-function animate()
+let battle_started = false;
+
+function input()
 {
-    let move = true;
-
-    player.moving = false;
-
     if 
     (
         checkKeyState("w") || checkKeyState("ArrowUp") ||
@@ -251,13 +249,14 @@ function animate()
             {
                 if (Math.random() < 0.01)
                 {
+                    battle_started = true;
                     console.log("battle zone collision!");
                 }
                 break;
             }
         }
     }
-
+    let move = true;
     if (checkKeyState("w") || checkKeyState("ArrowUp"))
     {
         player.moving = true;
@@ -350,7 +349,17 @@ function animate()
             });
         }
     }
+}
 
+function animate()
+{
+    player.moving = false;
+
+    if (!battle_started)
+    {
+        input();
+    }
+    
     if (!player.moving)
     {
         player.frames_index = 0;
