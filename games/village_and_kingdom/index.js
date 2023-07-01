@@ -112,12 +112,18 @@ playerImage4.src = "./resources/playerUp.png";
 
 class Sprite
 {
-    constructor(image, x, y, frames_max = 1)
+    constructor(image, x, y, frames_max = 1, sprites)
     {
         this.image = image;
         this.x = x;
         this.y = y;
         this.frames_max = frames_max;
+        this.sprites = sprites;
+
+        this.frames_index = 0;
+        this.frames_timer = 0;
+        this.moving = false;
+
         this.image.onload = ()=>
         {
             this.width = this.image.width / this.frames_max;
@@ -130,8 +136,9 @@ class Sprite
     draw()
     {
         //context.drawImage(this.image, this.x, this.y);
-        context.drawImage(this.image,
-            0,
+        context.drawImage(
+            this.image,
+            this.frames_index * this.width,
             0,
             this.image.width / this.frames_max,
             this.image.height,
@@ -140,6 +147,18 @@ class Sprite
             this.image.width / this.frames_max,
             this.image.height
         );
+        if (this.moving)
+        {
+            if (this.frames_timer % 20 === 0)
+            {
+                if (this.frames_index < this.frames_max - 1)
+                    this.frames_index++;
+                else
+                    this.frames_index = 0;
+            }
+            if (this.frames_max > 1)
+                this.frames_timer++;
+        }
     }
 }
 
@@ -147,10 +166,13 @@ let map = new Sprite(mapImage, backgroundImagePosX, backgroundImagePosY);
 
 let foreground = new Sprite(foregroundImage, backgroundImagePosX, backgroundImagePosY);
 
-let player = new Sprite(playerImage1, 
+let player = new Sprite(
+    playerImage1, 
     canvas.width / 2 - playerImage1.width / 8,
     canvas.height / 2 - playerImage1.height / 2,
-    4);
+    4,
+    [playerImage1, playerImage2, playerImage3, playerImage4]
+);
 
 let movables = [map, foreground, ...boundaries];
 
@@ -178,8 +200,13 @@ function AABB_Collision(rect1_x, rect1_y, rect1_w, rect1_h,
 function animate()
 {
     let move = true;
+
+    player.moving = false;
+
     if (checkKeyState("w") || checkKeyState("ArrowUp"))
     {
+        player.moving = true;
+        player.image = player.sprites[3];
         for (let i = 0; i < boundaries.length; i++)
         {
             let boundary = boundaries[i];
@@ -201,6 +228,8 @@ function animate()
     }
     else if (checkKeyState("s") || checkKeyState("ArrowDown"))
     {
+        player.moving = true;
+        player.image = player.sprites[0];
         for (let i = 0; i < boundaries.length; i++)
         {
             let boundary = boundaries[i];
@@ -222,6 +251,8 @@ function animate()
     }
     else if (checkKeyState("a") || checkKeyState("ArrowLeft"))
     {
+        player.moving = true;
+        player.image = player.sprites[1];
         for (let i = 0; i < boundaries.length; i++)
         {
             let boundary = boundaries[i];
@@ -243,6 +274,8 @@ function animate()
     }
     else if (checkKeyState("d") || checkKeyState("ArrowRight"))
     {
+        player.moving = true;
+        player.image = player.sprites[2];
         for (let i = 0; i < boundaries.length; i++)
         {
             let boundary = boundaries[i];
@@ -262,6 +295,13 @@ function animate()
             });
         }
     }
+
+    if (!player.moving)
+    {
+        player.frames_index = 0;
+        player.frames_timer = 0;
+    }
+
     map.draw();
     boundaries.forEach(
         boundary => {
