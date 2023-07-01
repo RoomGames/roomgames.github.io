@@ -10,13 +10,13 @@ let keyState = {};
 document.addEventListener('keydown', function(event)
 {
     keyState[event.key] = true;
-    console.log('按下键码：' + event.key);
+    //console.log('按下键码：' + event.key);
 });
 
 document.addEventListener('keyup', function(event)
 {
     keyState[event.key] = false;
-    console.log('释放键码：' + event.key);
+    //console.log('释放键码：' + event.key);
 });
 
 function checkKeyState(key)
@@ -228,6 +228,35 @@ function animate()
     let move = true;
 
     player.moving = false;
+
+    if 
+    (
+        checkKeyState("w") || checkKeyState("ArrowUp") ||
+        checkKeyState("s") || checkKeyState("ArrowDown") ||
+        checkKeyState("a") || checkKeyState("ArrowLeft") ||
+        checkKeyState("d") || checkKeyState("ArrowRight")
+    )
+    {
+        for (let i = 0; i < battleZones.length; i++)
+        {
+            let battleZone = battleZones[i];
+            let overlappingArea = 
+                (Math.min(player.x + player.width, battleZone.x + Boundary.width) - 
+                Math.max(player.x, battleZone.x)) * 
+                (Math.min(player.y + player.height, battleZone.y + Boundary.height) -
+                Math.max(player.y, battleZone.y));
+            if (AABB_Collision(player.x, player.y, player.width, player.height,
+                battleZone.x, battleZone.y, Boundary.width, Boundary.height) &&
+                overlappingArea > player.width * player.height / 2)
+            {
+                if (Math.random() < 0.01)
+                {
+                    console.log("battle zone collision!");
+                }
+                break;
+            }
+        }
+    }
 
     if (checkKeyState("w") || checkKeyState("ArrowUp"))
     {
