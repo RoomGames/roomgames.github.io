@@ -45,6 +45,13 @@ for (let i = 0; i < map_collision.length; i+= mapWidth)
     collisionMap.push(map_collision.slice(i, i + mapWidth));
 }
 
+// 1D array => 2D array
+let battle_zone_map = [];
+for (let i = 0; i < battle_zone.length; i+= mapWidth)
+{
+    battle_zone_map.push(battle_zone.slice(i, i + mapWidth));
+}
+
 class Boundary
 {
     static width = 48;  //12 * 4(zoom)
@@ -58,7 +65,7 @@ class Boundary
 
     draw()
     {
-        context.fillStyle = "rgba(255, 0, 0, 0.0)";
+        context.fillStyle = "rgba(255, 0, 0, 0.2)";
         context.fillRect(this.x, this.y, Boundary.width, Boundary.height);
     }
 }
@@ -81,7 +88,26 @@ collisionMap.forEach(
     }
 );
 
+let battleZones = [];
+battle_zone_map.forEach(
+    (row, i) => 
+    {
+        row.forEach(
+            (item, j) => 
+            {
+                if (item === collisionSymbol)
+                    battleZones.push(
+                        new Boundary(
+                            j * Boundary.width + offsetX, 
+                            i * Boundary.height + offsetY)
+                    );
+            }
+        );
+    }
+);
+
 //console.log(boundaries);
+//console.log(battleZones);
 
 canvas.width = 1024;
 canvas.height = 576;
@@ -174,7 +200,7 @@ let player = new Sprite(
     [playerImage1, playerImage2, playerImage3, playerImage4]
 );
 
-let movables = [map, foreground, ...boundaries];
+let movables = [map, foreground, ...boundaries, ...battleZones];
 
 //from: https://developer.mozilla.org/en-US/docs/Games/Techniques/2D_collision_detection
 function AABB_Collision(rect1_x, rect1_y, rect1_w, rect1_h, 
@@ -306,6 +332,11 @@ function animate()
     boundaries.forEach(
         boundary => {
             boundary.draw();
+        }
+    );
+    battleZones.forEach(
+        battleZone =>{
+            battleZone.draw();
         }
     );
     player.draw();
