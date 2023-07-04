@@ -34,12 +34,30 @@ function checkKeyState(key)
     return keyState[key] === true;
 }
 
+function get_real_ability_name(ability_name)
+{
+    switch(ability_name)
+    {
+        case "蛮王冲撞":
+            return "manwangchongzhuang";
+        case "王者之拉":
+            return "wangzhezhila";
+        case "大火球":
+            return "dahuoqiu";
+        case "火焰护体":
+            return "huoyanhuti";
+        default:
+            return "none";
+    }
+}
+
 // button click event:
 document.querySelectorAll("button").forEach(button => {
     button.addEventListener("click", () => {
-        console.log(button.innerHTML);
+        //console.log(button.innerText);
+        let selectedAbility = abilities[get_real_ability_name(button.innerText)];
         emby.attack(draggle, {
-            name: button.innerHTML,
+            name: button.innerText,
             damage: emby.battle_damage,
             type: "normal"
         });
