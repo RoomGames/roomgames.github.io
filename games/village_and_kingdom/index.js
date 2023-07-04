@@ -32,6 +32,14 @@ function checkKeyState(key)
     return keyState[key] === true;
 }
 
+// button click event:
+document.querySelectorAll("button").forEach(button => {
+    button.addEventListener("click", () => {
+        console.log(button.innerHTML);
+        emby.attack(draggle, null);
+    });
+});
+
 //test map.js
 //console.log(map_collision);
 
@@ -201,6 +209,24 @@ class Sprite
             if (this.frames_max > 1)
                 this.frames_timer++;
         }
+    }
+
+    attack(recipient, attackInfo)
+    {
+        const attack_val = 30;
+        const hit_val = 40;
+        const duration = 0.2;
+
+        let timeline = gsap.timeline();
+        timeline.
+            to(this, { x:this.x - attack_val }).
+            to(this, { x:this.x + attack_val * 2, duration: duration, onComplete() {
+                let timeline2 = gsap.timeline();
+                timeline2.
+                    to(recipient, { x:recipient.x + hit_val, duration: duration}).
+                    to(recipient, { x:recipient.x, duration: duration * 5});
+            }}).
+            to(this, { x:this.x });
     }
 }
 
@@ -472,6 +498,6 @@ function animate()
     render();
 }
 
-set_battle_ui(false);
-animate();
-//animate_battle();
+set_battle_ui(true);
+//animate();
+animate_battle();
