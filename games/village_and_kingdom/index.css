@@ -94,14 +94,21 @@ body
 
 .text
 {
+    font-family: 'Roboto Mono', monospace;
     font-size: 30px;
     font-weight: 1000;
 }
 
 .small_text
 {
+    font-family: 'Roboto Mono', monospace;
     font-size: 15px;
     font-weight: 1000;
+}
+
+.flex
+{
+    display: flex;
 }
 
 .btn
@@ -116,4 +123,16 @@ body
 button:hover
 {
     background-color: rgb(166, 166, 166);
+}
+
+#healthbar1_text
+{
+    position: absolute;
+    right: 12px;
+}
+
+#healthbar2_text
+{
+    position: absolute;
+    right: 12px;
 }

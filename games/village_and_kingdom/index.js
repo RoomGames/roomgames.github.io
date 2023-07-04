@@ -10,6 +10,8 @@ let context = canvas.getContext("2d");
 // Battle UI Elements:
 let healthbar1 = document.getElementById("healthbar1");
 let healthbar2 = document.getElementById("healthbar2");
+let healthbar1_text = document.getElementById("healthbar1_text");
+let healthbar2_text = document.getElementById("healthbar2_text");
 let ability = document.getElementById("ability");
 
 // keyState:
@@ -36,7 +38,16 @@ function checkKeyState(key)
 document.querySelectorAll("button").forEach(button => {
     button.addEventListener("click", () => {
         console.log(button.innerHTML);
-        emby.attack(draggle, null);
+        emby.attack(draggle, {
+            name: button.innerHTML,
+            damage: emby.battle_damage,
+            type: "normal"
+        });
+        // draggle.attack(emby, {
+        //     name: button.innerHTML,
+        //     damage: emby.battle_damage,
+        //     type: "normal"
+        // });
     });
 });
 
@@ -163,7 +174,7 @@ embyImage.src = "./resources/embySprite.png";
 
 class Sprite
 {
-    constructor(image, x, y, frames_max = 1, sprites = {}, animate = false, frames_hold = 20)
+    constructor(image, x, y, frames_max = 1, sprites = {}, animate = false, frames_hold = 20, opacity = 1)
     {
         this.image = image;
         this.x = x;
@@ -175,6 +186,14 @@ class Sprite
         this.frames_timer = 0;
         this.animate = animate;
         this.frames_hold = frames_hold;
+        this.opacity = opacity;
+
+        //properties:
+        this.battle_name = "none";
+        this.battle_alive = true;
+        this.battle_max_health = 100;
+        this.battle_cur_health = this.battle_max_health;
+        this.battle_damage = 10;
 
         this.image.onload = ()=>
         {
@@ -185,7 +204,8 @@ class Sprite
 
     draw()
     {
-        //context.drawImage(this.image, this.x, this.y);
+        context.save();
+        context.globalAlpha = this.opacity;
         context.drawImage(
             this.image,
             this.frames_index * this.width,
@@ -197,6 +217,8 @@ class Sprite
             this.image.width / this.frames_max,
             this.image.height
         );
+        context.restore();
+
         if (this.animate)
         {
             if (this.frames_timer % this.frames_hold === 0)
@@ -211,20 +233,76 @@ class Sprite
         }
     }
 
+    behit(damage)
+    {
+        if (!this.battle_alive) return;
+        this.battle_cur_health -= damage;
+        if (this.battle_cur_health <= 0)
+        {
+            this.battle_cur_health = 0;
+            this.battle_alive = false;
+        }
+    }
+
     attack(recipient, attackInfo)
     {
-        const attack_val = 30;
-        const hit_val = 40;
-        const duration = 0.2;
+        let attack_val = 30;
+        let behit_val = 10;
+        let duration = 0.12;
+        if (recipient.battle_name === "emby")
+        {
+            attack_val = -attack_val;
+            behit_val = -behit_val;
+        }
+        if (recipient.battle_name === "draggle")
+        {
+        }
 
         let timeline = gsap.timeline();
         timeline.
             to(this, { x:this.x - attack_val }).
             to(this, { x:this.x + attack_val * 2, duration: duration, onComplete() {
-                let timeline2 = gsap.timeline();
-                timeline2.
-                    to(recipient, { x:recipient.x + hit_val, duration: duration}).
-                    to(recipient, { x:recipient.x, duration: duration * 5});
+                //enemy gets hit:
+                recipient.behit(attackInfo.damage);
+                if (recipient.battle_name === "emby")
+                {
+                    //change healthbar text:
+                    healthbar1_text.innerText = recipient.battle_cur_health + "/" + recipient.battle_max_health;
+                    //change healthbar:
+                    gsap.to("#healthbar1_fill", {
+                        width: recipient.battle_cur_health / recipient.battle_max_health * 100 + "%"
+                    });
+                }
+                else if (recipient.battle_name === "draggle")
+                {
+                    //change healthbar text:
+                    healthbar2_text.innerText = recipient.battle_cur_health + "/" + recipient.battle_max_health;
+                    //change healthbar:
+                    gsap.to("#healthbar2_fill", {
+                        width: recipient.battle_cur_health / recipient.battle_max_health * 100 + "%"
+                    });
+                }
+                else
+                {
+                    console.log("Panic!!!");
+                }
+                //shake & flash:
+                gsap.to(recipient, {
+                    x: recipient.x + behit_val,
+                    yoyo: true,
+                    repeat: 5,
+                    duration: 0.08
+                });
+                gsap.to(recipient, {
+                    opacity: 0,
+                    yoyo: true,
+                    repeat: 5,
+                    duration: 0.05
+                });
+                // let timeline2 = gsap.timeline();
+                // timeline2.
+                //     to(recipient, { x:recipient.x + 40, duration: duration}).
+                //     to(recipient, { x:recipient.x, duration: duration * 5});
             }}).
             to(this, { x:this.x });
     }
@@ -246,9 +324,10 @@ let player = new Sprite(
 
 let battleBackground = new Sprite(battleBackgroundImage, 0, 0);
 
-let draggle = new Sprite(draggleImage, 800, 100, 4, [], true, 40);
-
 let emby = new Sprite(embyImage, 290, 320, 4, [], true, 40);
+emby.battle_name = "emby";
+let draggle = new Sprite(draggleImage, 800, 100, 4, [], true, 40);
+draggle.battle_name = "draggle";
 
 let movables = [map, foreground, ...boundaries, ...battleZones];
 
