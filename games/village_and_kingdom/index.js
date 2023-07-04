@@ -7,6 +7,11 @@ console.log(gsap);
 let canvas = document.querySelector("canvas");
 let context = canvas.getContext("2d");
 
+// Battle UI Elements:
+let healthbar1 = document.getElementById("healthbar1");
+let healthbar2 = document.getElementById("healthbar2");
+let ability = document.getElementById("ability");
+
 // keyState:
 let keyState = {};
 
@@ -245,6 +250,22 @@ function AABB_Collision(rect1_x, rect1_y, rect1_w, rect1_h,
 let battle_started = false;
 const battle_start_animation_duration = 0.6;
 
+function set_battle_ui(visible)
+{
+    if (visible)
+    {
+        healthbar1.style.visibility = "visible";
+        healthbar2.style.visibility = "visible";
+        ability.style.visibility = "visible";
+    }
+    else
+    {
+        healthbar1.style.visibility = "hidden";
+        healthbar2.style.visibility = "hidden";
+        ability.style.visibility = "hidden";
+    }
+}
+
 function start_battle()
 {
     battle_started = true;
@@ -263,8 +284,11 @@ function start_battle()
                 duration: battle_start_animation_duration,
                 onComplete()
                 {
+                    //enable battle ui:
+                    set_battle_ui(true);
                     //activate new animation loop:
                     animate_battle();
+                    //hide cover:
                     gsap.to("#cover", {
                         opacity: 0,
                         duration: battle_start_animation_duration
@@ -448,5 +472,6 @@ function animate()
     render();
 }
 
-//animate();
-animate_battle();
+set_battle_ui(false);
+animate();
+//animate_battle();
