@@ -24,6 +24,45 @@ body
     pointer-events: none;
 }
 
+#healthbar1
+{
+    background-color: white;
+    width: 300px;
+    position: absolute;
+    top: 5px;
+    left: 20px;
+    border: 3px black solid;
+    padding: 12px;
+}
+
+#healthbar2
+{
+    background-color: white;
+    width: 300px;
+    position: absolute;
+    top: 5px;
+    right: 20px;
+    border: 3px black solid;
+    padding: 12px;
+}
+
+.healthbg
+{
+    height: 10px;
+    background-color: rgb(100, 100, 100);
+    margin-top: 10px;
+}
+
+.fill
+{
+    height: 10px;
+    background-color: lightgreen;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+}
+
 #ability
 {
     font-family: 'Roboto Mono', monospace;
@@ -33,7 +72,7 @@ body
     bottom: 0;
     left: 0;
     right: 0;
-    border-top: 4px black solid;
+    border-top: 3px black solid;
     display: flex;
 }
 
@@ -50,12 +89,18 @@ body
     align-items: center;
     justify-content: center;
     width: 33.33%;
-    border-left: 4px black solid;
+    border-left: 3px black solid;
 }
 
 .text
 {
     font-size: 30px;
+    font-weight: 1000;
+}
+
+.small_text
+{
+    font-size: 15px;
     font-weight: 1000;
 }
 
