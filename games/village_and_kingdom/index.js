@@ -448,5 +448,5 @@ function animate()
     render();
 }
 
-animate();
-//animate_battle();
+//animate();
+animate_battle();

@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap');
+
 body
 {
     margin: 0;
@@ -20,4 +22,53 @@ body
     right: 0;
     opacity: 0;
     pointer-events: none;
+}
+
+#ability
+{
+    font-family: 'Roboto Mono', monospace;
+    background-color: white;
+    position: absolute;
+    height: 120px;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    border-top: 4px black solid;
+    display: flex;
+}
+
+#attack
+{
+    width: 66.66%;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+}
+
+#dis
+{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 33.33%;
+    border-left: 4px black solid;
+}
+
+.text
+{
+    font-size: 30px;
+    font-weight: 1000;
+}
+
+.btn
+{
+    font-family: 'Roboto Mono', monospace;
+    font-size: 20px;
+    font-weight: 800;
+    border: 0;
+    cursor: pointer;
+}
+
+button:hover
+{
+    background-color: rgb(166, 166, 166);
 }
