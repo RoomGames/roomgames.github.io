@@ -1,5 +1,8 @@
 console.log("Hello, Village and Kingdom!");
 
+//gsap library:
+console.log(gsap);
+
 // canvas & context:
 let canvas = document.querySelector("canvas");
 let context = canvas.getContext("2d");
@@ -136,9 +139,18 @@ playerImage3.src = "./resources/playerRight.png";
 let playerImage4 = new Image();
 playerImage4.src = "./resources/playerUp.png";
 
+let battleBackgroundImage = new Image();
+battleBackgroundImage.src = "./resources/battleBackground.png";
+
+let draggleImage = new Image();
+draggleImage.src = "./resources/draggleSprite.png";
+
+let embyImage = new Image();
+embyImage.src = "./resources/embySprite.png";
+
 class Sprite
 {
-    constructor(image, x, y, frames_max = 1, sprites)
+    constructor(image, x, y, frames_max = 1, sprites = {}, animate = false, frames_hold = 20)
     {
         this.image = image;
         this.x = x;
@@ -148,14 +160,13 @@ class Sprite
 
         this.frames_index = 0;
         this.frames_timer = 0;
-        this.moving = false;
+        this.animate = animate;
+        this.frames_hold = frames_hold;
 
         this.image.onload = ()=>
         {
             this.width = this.image.width / this.frames_max;
             this.height = this.image.height;
-            console.log(this.width);
-            console.log(this.height);
         };
     }
 
@@ -173,9 +184,9 @@ class Sprite
             this.image.width / this.frames_max,
             this.image.height
         );
-        if (this.moving)
+        if (this.animate)
         {
-            if (this.frames_timer % 20 === 0)
+            if (this.frames_timer % this.frames_hold === 0)
             {
                 if (this.frames_index < this.frames_max - 1)
                     this.frames_index++;
@@ -197,8 +208,16 @@ let player = new Sprite(
     canvas.width / 2 - playerImage1.width / 8,
     canvas.height / 2 - playerImage1.height / 2,
     4,
-    [playerImage1, playerImage2, playerImage3, playerImage4]
+    [playerImage1, playerImage2, playerImage3, playerImage4],
+    false,
+    20
 );
+
+let battleBackground = new Sprite(battleBackgroundImage, 0, 0);
+
+let draggle = new Sprite(draggleImage, 800, 100, 4, [], true, 40);
+
+let emby = new Sprite(embyImage, 290, 320, 4, [], true, 40);
 
 let movables = [map, foreground, ...boundaries, ...battleZones];
 
@@ -224,6 +243,37 @@ function AABB_Collision(rect1_x, rect1_y, rect1_w, rect1_h,
 }
 
 let battle_started = false;
+const battle_start_animation_duration = 0.6;
+
+function start_battle()
+{
+    battle_started = true;
+    //deactivate current animation loop:
+    window.cancelAnimationFrame(animationId);
+    //use gsap lib:
+    gsap.to("#cover", {
+        opacity: 1,
+        repeat: 1,
+        yoyo: true,
+        duration: battle_start_animation_duration,
+        onComplete()
+        {
+            gsap.to("#cover", {
+                opacity: 1,
+                duration: battle_start_animation_duration,
+                onComplete()
+                {
+                    //activate new animation loop:
+                    animate_battle();
+                    gsap.to("#cover", {
+                        opacity: 0,
+                        duration: battle_start_animation_duration
+                    });
+                }
+            });
+        }
+    });
+}
 
 function input()
 {
@@ -249,7 +299,7 @@ function input()
             {
                 if (Math.random() < 0.01)
                 {
-                    battle_started = true;
+                    start_battle();
                     console.log("battle zone collision!");
                 }
                 break;
@@ -259,7 +309,7 @@ function input()
     let move = true;
     if (checkKeyState("w") || checkKeyState("ArrowUp"))
     {
-        player.moving = true;
+        player.animate = true;
         player.image = player.sprites[3];
         for (let i = 0; i < boundaries.length; i++)
         {
@@ -282,7 +332,7 @@ function input()
     }
     else if (checkKeyState("s") || checkKeyState("ArrowDown"))
     {
-        player.moving = true;
+        player.animate = true;
         player.image = player.sprites[0];
         for (let i = 0; i < boundaries.length; i++)
         {
@@ -305,7 +355,7 @@ function input()
     }
     else if (checkKeyState("a") || checkKeyState("ArrowLeft"))
     {
-        player.moving = true;
+        player.animate = true;
         player.image = player.sprites[1];
         for (let i = 0; i < boundaries.length; i++)
         {
@@ -328,7 +378,7 @@ function input()
     }
     else if (checkKeyState("d") || checkKeyState("ArrowRight"))
     {
-        player.moving = true;
+        player.animate = true;
         player.image = player.sprites[2];
         for (let i = 0; i < boundaries.length; i++)
         {
@@ -351,21 +401,8 @@ function input()
     }
 }
 
-function animate()
+function render()
 {
-    player.moving = false;
-
-    if (!battle_started)
-    {
-        input();
-    }
-    
-    if (!player.moving)
-    {
-        player.frames_index = 0;
-        player.frames_timer = 0;
-    }
-
     map.draw();
     boundaries.forEach(
         boundary => {
@@ -379,8 +416,37 @@ function animate()
     );
     player.draw();
     foreground.draw();
+}
 
-    window.requestAnimationFrame(animate);
+let animationId;
+
+function animate_battle()
+{
+    window.requestAnimationFrame(animate_battle);
+    battleBackground.draw();
+    draggle.draw();
+    emby.draw();
+}
+
+function animate()
+{
+    animationId = window.requestAnimationFrame(animate);
+
+    player.animate = false;
+
+    if (!battle_started)
+    {
+        input();
+    }
+    
+    if (!player.animate)
+    {
+        player.frames_index = 0;
+        player.frames_timer = 0;
+    }
+
+    render();
 }
 
 animate();
+//animate_battle();
