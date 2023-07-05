@@ -114,9 +114,9 @@ body
 .btn
 {
     font-family: 'Roboto Mono', monospace;
-    font-size: 20px;
-    font-weight: 800;
-    border: 0;
+    font-size: 25px;
+    font-weight: 1000;
+    border: 1px rgb(100, 100, 100) solid;
     cursor: pointer;
 }
 

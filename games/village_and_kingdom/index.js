@@ -1,5 +1,8 @@
 console.log("Hello, Village and Kingdom!");
 
+//PI:
+const PI = 3.14159;
+
 //gsap library:
 console.log(gsap);
 
@@ -16,6 +19,9 @@ let ability = document.getElementById("ability");
 
 // keyState:
 let keyState = {};
+
+// renderer list:
+let renderedSprites = [];
 
 document.addEventListener('keydown', function(event)
 {
@@ -56,16 +62,14 @@ document.querySelectorAll("button").forEach(button => {
     button.addEventListener("click", () => {
         //console.log(button.innerText);
         let selectedAbility = abilities[get_real_ability_name(button.innerText)];
-        emby.attack(draggle, {
-            name: button.innerText,
-            damage: emby.battle_damage,
-            type: "normal"
-        });
-        // draggle.attack(emby, {
-        //     name: button.innerHTML,
-        //     damage: emby.battle_damage,
-        //     type: "normal"
-        // });
+        if (selectedAbility.damage_type != "无")
+        {
+            emby.attack(draggle, {
+                name: button.innerText,
+                damage: selectedAbility.damage,
+                type: selectedAbility.damage_type
+            });
+        }
     });
 });
 
@@ -190,21 +194,50 @@ draggleImage.src = "./resources/draggleSprite.png";
 let embyImage = new Image();
 embyImage.src = "./resources/embySprite.png";
 
+
+
+function update_healthbar(recipient)
+{
+    if (recipient.battle_name === "emby")
+    {
+        //change healthbar text:
+        healthbar1_text.innerText = recipient.battle_cur_health + "/" + recipient.battle_max_health;
+        //change healthbar:
+        gsap.to("#healthbar1_fill", {
+            width: recipient.battle_cur_health / recipient.battle_max_health * 100 + "%"
+        });
+    }
+    else if (recipient.battle_name === "draggle")
+    {
+        //change healthbar text:
+        healthbar2_text.innerText = recipient.battle_cur_health + "/" + recipient.battle_max_health;
+        //change healthbar:
+        gsap.to("#healthbar2_fill", {
+            width: recipient.battle_cur_health / recipient.battle_max_health * 100 + "%"
+        });
+    }
+    else
+    {
+        console.log("Panic!!!");
+    }
+}
+
 class Sprite
 {
-    constructor(image, x, y, frames_max = 1, sprites = {}, animate = false, frames_hold = 20, opacity = 1)
+    constructor(image, x, y, frames_max = 1, sprites = {}, animate = false, frames_hold = 20, opacity = 1, rotation = 0)
     {
         this.image = image;
         this.x = x;
         this.y = y;
         this.frames_max = frames_max;
         this.sprites = sprites;
-
-        this.frames_index = 0;
-        this.frames_timer = 0;
         this.animate = animate;
         this.frames_hold = frames_hold;
         this.opacity = opacity;
+        this.rotation = rotation;
+
+        this.frames_index = 0;
+        this.frames_timer = 0;
 
         //properties:
         this.battle_name = "none";
@@ -223,6 +256,12 @@ class Sprite
     draw()
     {
         context.save();
+        if (this.rotation != 0)
+        {
+            context.translate(this.x + this.width / 2, this.y + this.height / 2);
+            context.rotate(this.rotation * PI / 180);
+            context.translate(-this.x - this.width / 2, -this.y - this.height / 2);
+        }
         context.globalAlpha = this.opacity;
         context.drawImage(
             this.image,
@@ -264,65 +303,106 @@ class Sprite
 
     attack(recipient, attackInfo)
     {
+        let duration = 0.12;
+
         let attack_val = 30;
         let behit_val = 10;
-        let duration = 0.12;
+        let rotationAngle = 45;
         if (recipient.battle_name === "emby")
         {
             attack_val = -attack_val;
             behit_val = -behit_val;
+            rotationAngle = 225;
         }
         if (recipient.battle_name === "draggle")
         {
         }
 
-        let timeline = gsap.timeline();
-        timeline.
-            to(this, { x:this.x - attack_val }).
-            to(this, { x:this.x + attack_val * 2, duration: duration, onComplete() {
-                //enemy gets hit:
-                recipient.behit(attackInfo.damage);
-                if (recipient.battle_name === "emby")
-                {
-                    //change healthbar text:
-                    healthbar1_text.innerText = recipient.battle_cur_health + "/" + recipient.battle_max_health;
-                    //change healthbar:
-                    gsap.to("#healthbar1_fill", {
-                        width: recipient.battle_cur_health / recipient.battle_max_health * 100 + "%"
-                    });
-                }
-                else if (recipient.battle_name === "draggle")
-                {
-                    //change healthbar text:
-                    healthbar2_text.innerText = recipient.battle_cur_health + "/" + recipient.battle_max_health;
-                    //change healthbar:
-                    gsap.to("#healthbar2_fill", {
-                        width: recipient.battle_cur_health / recipient.battle_max_health * 100 + "%"
-                    });
-                }
-                else
-                {
-                    console.log("Panic!!!");
-                }
-                //shake & flash:
-                gsap.to(recipient, {
-                    x: recipient.x + behit_val,
-                    yoyo: true,
-                    repeat: 5,
-                    duration: 0.08
+        //animation
+        switch(get_real_ability_name(attackInfo.name))
+        {
+            case "manwangchongzhuang": //蛮王冲撞
+                let timeline = gsap.timeline();
+                //冲撞动画:
+                timeline.
+                    to(this, { x:this.x - attack_val }).
+                    to(this, { x:this.x + attack_val * 2, duration: duration, onComplete() {
+                        //enemy gets hit:
+                        recipient.behit(attackInfo.damage);
+                        //update healthbar:
+                        update_healthbar(recipient);
+                        //shake & flash:
+                        if (true)
+                        {
+                            gsap.to(recipient, {
+                                x: recipient.x + behit_val,
+                                yoyo: true,
+                                repeat: 5,
+                                duration: 0.08
+                            });
+                            gsap.to(recipient, {
+                                opacity: 0,
+                                yoyo: true,
+                                repeat: 5,
+                                duration: 0.05
+                            });
+                        }
+                        else
+                        {
+                            let timeline2 = gsap.timeline();
+                            timeline2.
+                                to(recipient, { x:recipient.x + 40, duration: duration}).
+                                to(recipient, { x:recipient.x, duration: duration * 5});
+                        }
+                    }}).
+                    to(this, { x: this.x });
+                break;
+            case "wangzhezhila": //王者之拉
+
+                break;
+            case "dahuoqiu": //大火球
+                let fireballImage = new Image();
+                fireballImage.src = "./resources/fireball.png";
+                let fireball = new Sprite(fireballImage, this.x, this.y, 4, {}, true, 20, 1, rotationAngle);
+                renderedSprites.push(fireball);
+                //wait animation:
+                gsap.to(fireball, {
+                    duration: 0.5,
+                    onComplete()
+                    {
+                        //fireball animation:
+                        gsap.to(fireball, {
+                            x: recipient.x,
+                            y: recipient.y,
+                            duration: 0.25,
+                            onComplete()
+                            {
+                                renderedSprites.pop();
+                                //enemy gets hit:
+                                recipient.behit(attackInfo.damage);
+                                //update healthbar:
+                                update_healthbar(recipient);
+                                //shake & flash:
+                                gsap.to(recipient, {
+                                    x: recipient.x + behit_val,
+                                    yoyo: true,
+                                    repeat: 5,
+                                    duration: 0.08
+                                });
+                                gsap.to(recipient, {
+                                    opacity: 0,
+                                    yoyo: true,
+                                    repeat: 5,
+                                    duration: 0.05
+                                });
+                            }
+                        });
+                    }
                 });
-                gsap.to(recipient, {
-                    opacity: 0,
-                    yoyo: true,
-                    repeat: 5,
-                    duration: 0.05
-                });
-                // let timeline2 = gsap.timeline();
-                // timeline2.
-                //     to(recipient, { x:recipient.x + 40, duration: duration}).
-                //     to(recipient, { x:recipient.x, duration: duration * 5});
-            }}).
-            to(this, { x:this.x });
+
+
+                break;
+        }
     }
 }
 
@@ -573,6 +653,9 @@ function animate_battle()
     battleBackground.draw();
     draggle.draw();
     emby.draw();
+    renderedSprites.forEach(sprite => {
+        sprite.draw();
+    });
 }
 
 function animate()
