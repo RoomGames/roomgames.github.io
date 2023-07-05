@@ -358,7 +358,8 @@ class Sprite
                     to(this, { x: this.x });
                 break;
             case "wangzhezhila": //王者之拉
-
+                //la animation:
+                //TODO
                 break;
             case "dahuoqiu": //大火球
                 let fireballImage = new Image();
@@ -399,8 +400,6 @@ class Sprite
                         });
                     }
                 });
-
-
                 break;
         }
     }
