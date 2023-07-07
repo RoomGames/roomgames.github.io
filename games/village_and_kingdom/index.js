@@ -16,12 +16,27 @@ let healthbar2 = document.getElementById("healthbar2");
 let healthbar1_text = document.getElementById("healthbar1_text");
 let healthbar2_text = document.getElementById("healthbar2_text");
 let ability = document.getElementById("ability");
+let battle_dialog = document.querySelector("#battle_dialog");
+battle_dialog.addEventListener("click", () => {
+    if (queue.length > 0)
+    {
+        queue[0]();
+        queue.shift();
+    }
+    else
+    {
+        battle_dialog.style.display = "none";
+    }
+});
 
 // keyState:
 let keyState = {};
 
 // renderer list:
 let renderedSprites = [];
+
+// abilities queue:
+let queue = [];
 
 document.addEventListener('keydown', function(event)
 {
@@ -52,6 +67,8 @@ function get_real_ability_name(ability_name)
             return "dahuoqiu";
         case "火焰护体":
             return "huoyanhuti";
+        case "强袭":
+            return "qiangxi";
         default:
             return "none";
     }
@@ -62,14 +79,20 @@ document.querySelectorAll("button").forEach(button => {
     button.addEventListener("click", () => {
         //console.log(button.innerText);
         let selectedAbility = abilities[get_real_ability_name(button.innerText)];
-        if (selectedAbility.damage_type != "无")
-        {
-            emby.attack(draggle, {
-                name: button.innerText,
-                damage: selectedAbility.damage,
-                type: selectedAbility.damage_type
+        //attack!
+        emby.attack(draggle, {
+            name: button.innerText,
+            damage: selectedAbility.damage,
+            type: selectedAbility.damage_type
+        });
+        //monster's next attack:
+        queue.push(() => {
+            draggle.attack(emby, {
+                name: abilities.qiangxi.name,
+                damage: abilities.qiangxi.damage,
+                type: abilities.qiangxi.damage_type
             });
-        }
+        });
     });
 });
 
@@ -194,8 +217,6 @@ draggleImage.src = "./resources/draggleSprite.png";
 let embyImage = new Image();
 embyImage.src = "./resources/embySprite.png";
 
-
-
 function update_healthbar(recipient)
 {
     if (recipient.battle_name === "emby")
@@ -239,7 +260,7 @@ class Sprite
         this.frames_index = 0;
         this.frames_timer = 0;
 
-        //properties:
+        //set battle properties:
         this.battle_name = "none";
         this.battle_alive = true;
         this.battle_max_health = 100;
@@ -251,6 +272,16 @@ class Sprite
             this.width = this.image.width / this.frames_max;
             this.height = this.image.height;
         };
+    }
+
+    set_battle_info(battle_name, battle_max_health, battle_damage)
+    {
+        //set battle properties:
+        this.battle_name = battle_name;
+        this.battle_alive = true;
+        this.battle_max_health = battle_max_health;
+        this.battle_cur_health = this.battle_max_health;
+        this.battle_damage = battle_damage;
     }
 
     draw()
@@ -308,6 +339,7 @@ class Sprite
         let attack_val = 30;
         let behit_val = 10;
         let rotationAngle = 45;
+
         if (recipient.battle_name === "emby")
         {
             attack_val = -attack_val;
@@ -317,6 +349,10 @@ class Sprite
         if (recipient.battle_name === "draggle")
         {
         }
+
+        //set battle dialog:
+        battle_dialog.style.display = "block";
+        battle_dialog.innerText = this.battle_name + " 使用了 " + attackInfo.name;
 
         //animation
         switch(get_real_ability_name(attackInfo.name))
@@ -400,6 +436,40 @@ class Sprite
                         });
                     }
                 });
+                break;
+            case "qiangxi": //强袭
+                //冲撞动画:
+                gsap.timeline().
+                    to(this, { x:this.x - attack_val }).
+                    to(this, { x:this.x + attack_val * 2, duration: duration, onComplete() {
+                        //enemy gets hit:
+                        recipient.behit(attackInfo.damage);
+                        //update healthbar:
+                        update_healthbar(recipient);
+                        //shake & flash:
+                        if (true)
+                        {
+                            gsap.to(recipient, {
+                                x: recipient.x + behit_val,
+                                yoyo: true,
+                                repeat: 5,
+                                duration: 0.08
+                            });
+                            gsap.to(recipient, {
+                                opacity: 0,
+                                yoyo: true,
+                                repeat: 5,
+                                duration: 0.05
+                            });
+                        }
+                        else
+                        {
+                            gsap.timeline().
+                                to(recipient, { x:recipient.x + 40, duration: duration}).
+                                to(recipient, { x:recipient.x, duration: duration * 5});
+                        }
+                    }}).
+                    to(this, { x: this.x });
                 break;
         }
     }
