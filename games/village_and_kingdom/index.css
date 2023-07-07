@@ -78,6 +78,9 @@ body
 
 #battle_dialog
 {
+    font-family: 'Roboto Mono', monospace;
+    font-size: 22px;
+    font-weight: 600;
     position: absolute;
     top: 0;
     right: 0;
@@ -87,6 +90,7 @@ body
     padding: 12px;
     display: none;
     cursor: pointer;
+    user-select: none;
 }
 
 #attack
@@ -107,6 +111,7 @@ body
     justify-content: center;
     width: 33.33%;
     border-left: 3px black solid;
+    user-select: none;
 }
 
 .text
@@ -135,6 +140,7 @@ body
     font-weight: 1000;
     border: 1px rgb(100, 100, 100) solid;
     cursor: pointer;
+    user-select: none;
 }
 
 button:hover
