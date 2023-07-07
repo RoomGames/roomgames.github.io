@@ -108,6 +108,14 @@ document.querySelectorAll("button").forEach(button => {
             damage: selectedAbility.damage,
             type: selectedAbility.damage_type
         });
+        //if monster dead:
+        if (!draggle.battle_alive)
+        {
+            queue.push(() => {
+                draggle.faint();
+            });
+            return;
+        }
         //monster's next attack(randomly):
         let randomAbility = monster_ability_queue[range(monster_ability_queue.length)];
         queue.push(() => {
@@ -117,6 +125,13 @@ document.querySelectorAll("button").forEach(button => {
                 type: randomAbility.damage_type
             });
         });
+        //if player dead:
+        if (!emby.battle_alive)
+        {
+            queue.push(() => {
+                emby.faint();
+            });
+        }
     });
     //mouse enter:
     button.addEventListener("mouseenter", () => {
@@ -373,6 +388,20 @@ class Sprite
         }
     }
 
+    faint()
+    {
+        //set battle dialog:
+        battle_dialog.style.display = "block";
+        battle_dialog.innerText = this.battle_name + " 死亡了!";
+        //animation:
+        gsap.to(this, {
+            y: this.y + 20
+        });
+        gsap.to(this, {
+            opacity: 0
+        });
+    }
+
     attack(recipient, attackInfo)
     {
         let duration = 0.12;
@@ -394,7 +423,8 @@ class Sprite
         //set battle dialog:
         battle_dialog.style.display = "block";
         battle_dialog.innerText = this.battle_name + " 使用了 " + attackInfo.name;
-
+        //enemy gets hit:
+        recipient.behit(attackInfo.damage);
         //animation
         switch(get_real_ability_name(attackInfo.name))
         {
@@ -404,8 +434,6 @@ class Sprite
                 timeline.
                     to(this, { x:this.x - attack_val }).
                     to(this, { x:this.x + attack_val * 2, duration: duration, onComplete() {
-                        //enemy gets hit:
-                        recipient.behit(attackInfo.damage);
                         //update healthbar:
                         update_healthbar(recipient);
                         //shake & flash:
@@ -456,8 +484,6 @@ class Sprite
                             onComplete()
                             {
                                 renderedSprites.pop();
-                                //enemy gets hit:
-                                recipient.behit(attackInfo.damage);
                                 //update healthbar:
                                 update_healthbar(recipient);
                                 //shake & flash:
@@ -483,8 +509,6 @@ class Sprite
                 gsap.timeline().
                     to(this, { x:this.x - attack_val }).
                     to(this, { x:this.x + attack_val * 2, duration: duration, onComplete() {
-                        //enemy gets hit:
-                        recipient.behit(attackInfo.damage);
                         //update healthbar:
                         update_healthbar(recipient);
                         //shake & flash:
