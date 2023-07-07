@@ -28,6 +28,22 @@ battle_dialog.addEventListener("click", () => {
         battle_dialog.style.display = "none";
     }
 });
+let abilityBar = document.querySelector("#attack");
+let abilityDamageTypeText = document.getElementById("dis");
+
+function addAbility(name)
+{
+    let button = document.createElement("button");
+    button.className = "btn";
+    button.innerText = name;
+    abilityBar.append(button);
+}
+
+//add abilities:
+addAbility("蛮王冲撞");
+addAbility("王者之拉");
+addAbility("大火球");
+addAbility("火焰护体");
 
 // keyState:
 let keyState = {};
@@ -37,6 +53,7 @@ let renderedSprites = [];
 
 // abilities queue:
 let queue = [];
+let monster_ability_queue = [abilities.manwangchongzhuang, abilities.dahuoqiu, abilities.qiangxi];
 
 document.addEventListener('keydown', function(event)
 {
@@ -74,25 +91,49 @@ function get_real_ability_name(ability_name)
     }
 }
 
+//int:[0, max)
+function range(max)
+{
+    return Math.floor(Math.random() * max);
+}
+
 // button click event:
 document.querySelectorAll("button").forEach(button => {
+    let selectedAbility = abilities[get_real_ability_name(button.innerText)];
+    //click event:
     button.addEventListener("click", () => {
-        //console.log(button.innerText);
-        let selectedAbility = abilities[get_real_ability_name(button.innerText)];
         //attack!
         emby.attack(draggle, {
             name: button.innerText,
             damage: selectedAbility.damage,
             type: selectedAbility.damage_type
         });
-        //monster's next attack:
+        //monster's next attack(randomly):
+        let randomAbility = monster_ability_queue[range(monster_ability_queue.length)];
         queue.push(() => {
             draggle.attack(emby, {
-                name: abilities.qiangxi.name,
-                damage: abilities.qiangxi.damage,
-                type: abilities.qiangxi.damage_type
+                name: randomAbility.name,
+                damage: randomAbility.damage,
+                type: randomAbility.damage_type
             });
         });
+    });
+    //mouse enter:
+    button.addEventListener("mouseenter", () => {
+        //change color:
+        if (selectedAbility.damage_type === "物理")
+        {
+            abilityDamageTypeText.style.color = "red";
+        }
+        else if (selectedAbility.damage_type === "魔法")
+        {
+            abilityDamageTypeText.style.color = "blue";
+        }
+        else
+        {
+            abilityDamageTypeText.style.color = "black";    
+        }
+        abilityDamageTypeText.innerText = selectedAbility.damage_type;
     });
 });
 
