@@ -281,32 +281,17 @@ context.fillRect(0, 0, canvas.width, canvas.height);
 //console.log(canvas);
 //console.log(context);
 
-let mapImage = new Image();
-mapImage.src = "./resources/map.png";
+let playerDownImage = new Image();
+playerDownImage.src = "./resources/playerDown.png";
 
-let foregroundImage = new Image();
-foregroundImage.src = "./resources/foreground.png";
+let playerLeftImage = new Image();
+playerLeftImage.src = "./resources/playerLeft.png";
 
-let playerImage1 = new Image();
-playerImage1.src = "./resources/playerDown.png";
+let playerRightImage = new Image();
+playerRightImage.src = "./resources/playerRight.png";
 
-let playerImage2 = new Image();
-playerImage2.src = "./resources/playerLeft.png";
-
-let playerImage3 = new Image();
-playerImage3.src = "./resources/playerRight.png";
-
-let playerImage4 = new Image();
-playerImage4.src = "./resources/playerUp.png";
-
-let battleBackgroundImage = new Image();
-battleBackgroundImage.src = "./resources/battleBackground.png";
-
-let draggleImage = new Image();
-draggleImage.src = "./resources/draggleSprite.png";
-
-let embyImage = new Image();
-embyImage.src = "./resources/embySprite.png";
+let playerUpImage = new Image();
+playerUpImage.src = "./resources/playerUp.png";
 
 function update_healthbar(recipient)
 {
@@ -336,9 +321,9 @@ function update_healthbar(recipient)
 
 class Sprite
 {
-    constructor(image, x, y, frames_max = 1, sprites = {}, animate = false, frames_hold = 20, opacity = 1, rotation = 0)
+    constructor(image_src, x, y, frames_max = 1, sprites = {}, animate = false, frames_hold = 20, opacity = 1, rotation = 0)
     {
-        this.image = image;
+        this.image = new Image();
         this.x = x;
         this.y = y;
         this.frames_max = frames_max;
@@ -358,11 +343,12 @@ class Sprite
         this.battle_cur_health = this.battle_max_health;
         this.battle_damage = 10;
 
-        this.image.onload = ()=>
+        this.image.onload = () =>
         {
             this.width = this.image.width / this.frames_max;
             this.height = this.image.height;
         };
+        this.image.src = image_src;
     }
 
     set_battle_info(battle_name, battle_max_health, battle_damage)
@@ -502,9 +488,7 @@ class Sprite
                 //TODO
                 break;
             case "dahuoqiu": //大火球
-                let fireballImage = new Image();
-                fireballImage.src = "./resources/fireball.png";
-                let fireball = new Sprite(fireballImage, this.x, this.y, 4, {}, true, 20, 1, rotationAngle);
+                let fireball = new Sprite("./resources/fireball.png", this.x, this.y, 4, {}, true, 20, 1, rotationAngle);
                 renderedSprites.push(fireball);
                 //wait animation:
                 gsap.to(fireball, {
@@ -575,25 +559,25 @@ class Sprite
     }
 }
 
-let map = new Sprite(mapImage, backgroundImagePosX, backgroundImagePosY);
+let map = new Sprite("./resources/map.png", backgroundImagePosX, backgroundImagePosY);
 
-let foreground = new Sprite(foregroundImage, backgroundImagePosX, backgroundImagePosY);
+let foreground = new Sprite("./resources/foreground.png", backgroundImagePosX, backgroundImagePosY);
 
 let player = new Sprite(
-    playerImage1, 
-    canvas.width / 2 - playerImage1.width / 8,
-    canvas.height / 2 - playerImage1.height / 2,
+    "./resources/playerDown.png", 
+    canvas.width / 2 - playerDownImage.width / 8,
+    canvas.height / 2 - playerDownImage.height / 2,
     4,
-    [playerImage1, playerImage2, playerImage3, playerImage4],
+    [playerDownImage, playerLeftImage, playerRightImage, playerUpImage],
     false,
     20
 );
 
-let battleBackground = new Sprite(battleBackgroundImage, 0, 0);
+let battleBackground = new Sprite("./resources/battleBackground.png", 0, 0);
 
-let emby = new Sprite(embyImage, 290, 320, 4, [], true, 40);
+let emby = new Sprite("./resources/embySprite.png", 290, 320, 4, [], true, 40);
 emby.battle_name = "emby";
-let draggle = new Sprite(draggleImage, 800, 100, 4, [], true, 40);
+let draggle = new Sprite("./resources/draggleSprite.png", 800, 100, 4, [], true, 40);
 draggle.battle_name = "draggle";
 
 let movables = [map, foreground, ...boundaries, ...battleZones];
@@ -858,9 +842,9 @@ function initBattle()
     document.getElementById("healthbar1_fill").style.width = "100%";
     document.getElementById("healthbar2_fill").style.width = "100%";
 
-    emby = new Sprite(embyImage, 290, 320, 4, [], true, 40);
+    emby = new Sprite("./resources/embySprite.png", 290, 320, 4, [], true, 40);
     emby.battle_name = "emby";
-    draggle = new Sprite(draggleImage, 800, 100, 4, [], true, 40);
+    draggle = new Sprite("./resources/draggleSprite.png", 800, 100, 4, [], true, 40);
     draggle.battle_name = "draggle";
     queue = [];
 }
