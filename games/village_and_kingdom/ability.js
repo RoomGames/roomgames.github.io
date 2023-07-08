@@ -3,7 +3,7 @@ let abilities =
     manwangchongzhuang:
     {
         name: "蛮王冲撞",
-        damage: 12,
+        damage: 120,
         damage_type: "物理",
         effect: "附带目标最大生命值5%的物理伤害",
         desc: "燃烧身体里蕴含的蛮族血液, 向着目标冲冲冲撞撞撞"

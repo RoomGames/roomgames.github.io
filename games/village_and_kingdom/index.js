@@ -11,6 +11,7 @@ let canvas = document.querySelector("canvas");
 let context = canvas.getContext("2d");
 
 // Battle UI Elements:
+let uiRoot = document.getElementById("ui");
 let healthbar1 = document.getElementById("healthbar1");
 let healthbar2 = document.getElementById("healthbar2");
 let healthbar1_text = document.getElementById("healthbar1_text");
@@ -114,6 +115,23 @@ document.querySelectorAll("button").forEach(button => {
             queue.push(() => {
                 draggle.faint();
             });
+            queue.push(() => {
+                gsap.to("#cover", {
+                    opacity: 1,
+                    onComplete()
+                    {
+                        //disable ui:
+                        uiRoot.style.display = "none";
+                        gsap.to("#cover", {
+                            opacity: 0
+                        });
+                        //change animation loop:
+                        window.cancelAnimationFrame(battleAnimationId);
+                        animate();
+                    }
+                });
+            });
+            battle_started = false;
             return;
         }
         //monster's next attack(randomly):
@@ -131,6 +149,23 @@ document.querySelectorAll("button").forEach(button => {
             queue.push(() => {
                 emby.faint();
             });
+            queue.push(() => {
+                gsap.to("#cover", {
+                    opacity: 1,
+                    onComplete()
+                    {
+                        //disable ui:
+                        uiRoot.style.display = "none";
+                        gsap.to("#cover", {
+                            opacity: 0
+                        });
+                        //change animation loop:
+                        window.cancelAnimationFrame(battleAnimationId);
+                        animate();
+                    }
+                });
+            });
+            battle_started = false;
         }
     });
     //mouse enter:
@@ -621,6 +656,8 @@ function start_battle()
                 duration: battle_start_animation_duration,
                 onComplete()
                 {
+                    //initBattle:
+                    initBattle();
                     //enable battle ui:
                     set_battle_ui(true);
                     //activate new animation loop:
@@ -779,11 +816,11 @@ function render()
     foreground.draw();
 }
 
-let animationId;
+let battleAnimationId;
 
 function animate_battle()
 {
-    window.requestAnimationFrame(animate_battle);
+    battleAnimationId = window.requestAnimationFrame(animate_battle);
     battleBackground.draw();
     draggle.draw();
     emby.draw();
@@ -791,6 +828,8 @@ function animate_battle()
         sprite.draw();
     });
 }
+
+let animationId;
 
 function animate()
 {
@@ -812,6 +851,20 @@ function animate()
     render();
 }
 
-set_battle_ui(true);
-//animate();
-animate_battle();
+function initBattle()
+{
+    uiRoot.style.display = "block";
+    battle_dialog.style.display = "none";
+    document.getElementById("healthbar1_fill").style.width = "100%";
+    document.getElementById("healthbar2_fill").style.width = "100%";
+
+    emby = new Sprite(embyImage, 290, 320, 4, [], true, 40);
+    emby.battle_name = "emby";
+    draggle = new Sprite(draggleImage, 800, 100, 4, [], true, 40);
+    draggle.battle_name = "draggle";
+    queue = [];
+}
+
+set_battle_ui(false);
+animate();
+//animate_battle();

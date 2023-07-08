@@ -9,39 +9,41 @@
 <body>
     <div id="container">
         <div id="cover"></div>
-        <div id="healthbar1">
-            <div class="flex">
-                <div class="small_text">Emby</div>
-                <div id="healthbar1_text" class="small_text">100/100</div>
+        <div id="ui">
+            <div id="healthbar1">
+                <div class="flex">
+                    <div class="small_text">Emby</div>
+                    <div id="healthbar1_text" class="small_text">100/100</div>
+                </div>
+                <div style="position: relative;">
+                    <div class="healthbg"></div>
+                    <div id="healthbar1_fill" class="fill"></div>
+                </div>
             </div>
-            <div style="position: relative;">
-                <div class="healthbg"></div>
-                <div id="healthbar1_fill" class="fill"></div>
+            <div id="healthbar2">
+                <div class="flex">
+                    <div class="small_text">Draggle</div>
+                    <div id="healthbar2_text" class="small_text">100/100</div>
+                </div>
+                <div style="position: relative;">
+                    <div class="healthbg"></div>
+                    <div id="healthbar2_fill" class="fill"></div>
+                </div>
             </div>
-        </div>
-        <div id="healthbar2">
-            <div class="flex">
-                <div class="small_text">Draggle</div>
-                <div id="healthbar2_text" class="small_text">100/100</div>
-            </div>
-            <div style="position: relative;">
-                <div class="healthbg"></div>
-                <div id="healthbar2_fill" class="fill"></div>
+            <div id="ability">
+                <div id="battle_dialog">battle dialog</div>
+                <div id="attack">
+                    <!-- <button class="btn">蛮王冲撞</button>
+                    <button class="btn">王者之拉</button>
+                    <button class="btn">大火球</button> -->
+                    <!-- <button class="btn">火焰护体</button> -->
+                </div>
+                <div id="dis">
+                    <div class="text">Attack Type</div>
+                </div>
             </div>
         </div>
         <canvas></canvas>
-        <div id="ability">
-            <div id="battle_dialog">battle dialog</div>
-            <div id="attack">
-                <!-- <button class="btn">蛮王冲撞</button>
-                <button class="btn">王者之拉</button>
-                <button class="btn">大火球</button> -->
-                <!-- <button class="btn">火焰护体</button> -->
-            </div>
-            <div id="dis">
-                <div class="text">Attack Type</div>
-            </div>
-        </div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" integrity="sha512-16esztaSRplJROstbIIdwX3N97V1+pZvV33ABoG1H2OyTttBxEGkTsoIVsiP1iaTtM8b3+hu2kB6pQ4Clr5yug==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="map.js"></script>
